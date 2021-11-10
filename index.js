@@ -24,6 +24,8 @@ let persons = [
   },
 ];
 
+app.use(express.json());
+
 app.get('/api/persons', (_, res) => {
   res.json(persons);
 });
@@ -46,6 +48,43 @@ app.get('/info', (_, res) => {
       <p>${new Date()}</p>
     `
   );
+});
+
+app.post('/api/persons', (req, res) => {
+  const { name, number } = req.body;
+
+  const generateId = () => {
+    const maxID =
+      persons.length > 0 ? Math.max(...persons.map((person) => person.id)) : 0;
+    return maxID + 1;
+  };
+
+  if (!name) {
+    return res.status(404).json({
+      error: 'name cannot be blank',
+    });
+  }
+
+  if (!number) {
+    return res.status(404).json({
+      error: 'number cannot be blank',
+    });
+  }
+
+  if (persons.some((person) => person.name === name)) {
+    return res.status(404).json({
+      error: 'name must be unique',
+    });
+  }
+
+  const person = {
+    name,
+    number,
+    id: generateId(),
+  };
+
+  persons = [...persons, person];
+  res.json(person);
 });
 
 app.delete('/api/persons/:id', (req, res) => {
