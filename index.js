@@ -24,11 +24,22 @@ const persons = [
   },
 ];
 
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (_, res) => {
   res.json(persons);
 });
 
-app.get('/info', (req, res) => {
+app.get('/api/persons/:id', (req, res) => {
+  const { id } = req.params;
+  const person = persons.find((person) => person.id === +id);
+
+  if (person) {
+    res.json(person);
+  } else {
+    res.status(404).end();
+  }
+});
+
+app.get('/info', (_, res) => {
   res.send(
     `
       <p>Phonebook has info for ${persons.length} people</p>
