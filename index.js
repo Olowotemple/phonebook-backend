@@ -63,14 +63,8 @@ app.get('/info', (_, res) => {
   );
 });
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', async (req, res) => {
   const { name, number } = req.body;
-
-  const generateId = () => {
-    const maxID =
-      persons.length > 0 ? Math.max(...persons.map((person) => person.id)) : 0;
-    return maxID + 1;
-  };
 
   if (!name) {
     return res.status(404).json({
@@ -90,14 +84,14 @@ app.post('/api/persons', (req, res) => {
     });
   }
 
-  const person = {
+  const person = new Person({
     name,
     number,
-    id: generateId(),
-  };
+  });
+  console.log('new Person is', person);
 
-  persons = [...persons, person];
-  res.json(person);
+  const returnedPerson = await person.save();
+  res.json(returnedPerson);
 });
 
 app.delete('/api/persons/:id', (req, res) => {
