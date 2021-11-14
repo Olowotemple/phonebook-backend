@@ -25,9 +25,9 @@ app.get('/api/persons', async (_, res) => {
   res.json(persons);
 });
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', async (req, res) => {
   const { id } = req.params;
-  const person = persons.find((person) => person.id === +id);
+  const person = await Person.findById(id);
 
   if (person) {
     res.json(person);
@@ -36,7 +36,8 @@ app.get('/api/persons/:id', (req, res) => {
   }
 });
 
-app.get('/info', (_, res) => {
+app.get('/info', async (_, res) => {
+  const persons = await Person.find({});
   res.send(
     `
       <p>Phonebook has info for ${persons.length} people</p>
