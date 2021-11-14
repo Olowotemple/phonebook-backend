@@ -94,10 +94,13 @@ app.post('/api/persons', async (req, res) => {
   res.json(returnedPerson);
 });
 
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', async (req, res) => {
   const { id } = req.params;
-  persons = persons.filter((person) => person.id !== +id);
-  res.status(204).end();
+  const person = await Person.findByIdAndRemove(id);
+  if (person) {
+    return res.status(204).end();
+  }
+  res.status(404).end();
 });
 
 const PORT = process.env.PORT || 3001;
