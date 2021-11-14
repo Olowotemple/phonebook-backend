@@ -8,28 +8,10 @@ const app = express();
 
 morgan.token('body', (req) => JSON.stringify(req.body));
 
-let persons = [
-  {
-    id: 1,
-    name: 'Arto Hellas',
-    number: '040-123456',
-  },
-  {
-    id: 2,
-    name: 'Ada Lovelace',
-    number: '39-44-5323523',
-  },
-  {
-    id: 3,
-    name: 'Dan Abramov',
-    number: '12-43-234345',
-  },
-  {
-    id: 4,
-    name: 'Mary Poppendieck',
-    number: '39-23-6423122',
-  },
-];
+const errorHandler = (error, req, res, next) => {
+  console.error(error);
+  next(error);
+};
 
 app.use(cors());
 app.use(express.static('build'));
@@ -65,6 +47,7 @@ app.get('/info', (_, res) => {
 
 app.post('/api/persons', async (req, res) => {
   const { name, number } = req.body;
+  const persons = await Person.find({});
 
   if (!name) {
     return res.status(404).json({
@@ -88,7 +71,6 @@ app.post('/api/persons', async (req, res) => {
     name,
     number,
   });
-  console.log('new Person is', person);
 
   const returnedPerson = await person.save();
   res.json(returnedPerson);
@@ -102,6 +84,23 @@ app.delete('/api/persons/:id', async (req, res) => {
   }
   res.status(404).end();
 });
+
+app.put('/api/persons/:id', async (req, res) => {
+  const { id } = req.params;
+  const { name, number } = req.body;
+
+  const person = {
+    name,
+    number,
+  };
+
+  const updatedPerson = await Person.findByIdAndUpdate(id, person, {
+    new: true,
+  });
+  res.json(updatedPerson);
+});
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(

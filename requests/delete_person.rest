@@ -11,3 +11,12 @@ Content-Type: application/json
   "name": "Temple Olowonigba",
   "number": "112-917112"
 }
+
+###
+PUT http://localhost:3001/api/persons/61914c5be6bee5c22b9208ce
+Content-Type: application/json
+
+{
+  "name": "Temple Olowonigba",
+  "number": "737-373731"
+}
