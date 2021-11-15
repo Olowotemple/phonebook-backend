@@ -13,10 +13,12 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "eslint": "^8.2.0",
     "nodemon": "^2.0.15"
   },
   "scripts": {
     "dev": "nodemon index.js",
+    "lint": "eslint .",
     "start": "node index.js"
   }
 }
