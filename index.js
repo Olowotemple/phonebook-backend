@@ -9,7 +9,15 @@ const app = express();
 morgan.token('body', (req) => JSON.stringify(req.body));
 
 const errorHandler = (error, req, res, next) => {
-  console.error(error);
+  if (error.name === 'CastError') {
+    return res.status(400).json({ error: 'malformatted id' });
+  }
+
+  if (error.name === 'ValidationError') {
+    const { path, kind } = error.errors.name;
+    console.log(path, kind);
+    return res.status(400).json({ error: `${path} should be ${kind}` });
+  }
   next(error);
 };
 
@@ -25,14 +33,18 @@ app.get('/api/persons', async (_, res) => {
   res.json(persons);
 });
 
-app.get('/api/persons/:id', async (req, res) => {
+app.get('/api/persons/:id', async (req, res, next) => {
   const { id } = req.params;
-  const person = await Person.findById(id);
+  try {
+    const person = await Person.findById(id);
 
-  if (person) {
-    res.json(person);
-  } else {
-    res.status(404).end();
+    if (person) {
+      res.json(person);
+    } else {
+      res.status(404).end();
+    }
+  } catch (error) {
+    next(error);
   }
 });
 
@@ -46,35 +58,31 @@ app.get('/info', async (_, res) => {
   );
 });
 
-app.post('/api/persons', async (req, res) => {
+app.post('/api/persons', async (req, res, next) => {
   const { name, number } = req.body;
-  const persons = await Person.find({});
 
   if (!name) {
-    return res.status(404).json({
+    return res.status(400).json({
       error: 'name cannot be blank',
     });
   }
 
   if (!number) {
-    return res.status(404).json({
+    return res.status(400).json({
       error: 'number cannot be blank',
     });
   }
 
-  if (persons.some((person) => person.name === name)) {
-    return res.status(404).json({
-      error: 'name must be unique',
+  try {
+    const person = new Person({
+      name,
+      number,
     });
+    const returnedPerson = await person.save();
+    res.json(returnedPerson);
+  } catch (error) {
+    next(error);
   }
-
-  const person = new Person({
-    name,
-    number,
-  });
-
-  const returnedPerson = await person.save();
-  res.json(returnedPerson);
 });
 
 app.delete('/api/persons/:id', async (req, res) => {
