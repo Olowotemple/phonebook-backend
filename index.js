@@ -14,9 +14,8 @@ const errorHandler = (error, req, res, next) => {
   }
 
   if (error.name === 'ValidationError') {
-    const { path, kind } = error.errors.name;
-    console.log(path, kind);
-    return res.status(400).json({ error: `${path} should be ${kind}` });
+    const { name, number } = error.errors;
+    return res.status(400).json({ error: `${name || number}` });
   }
   next(error);
 };

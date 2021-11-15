@@ -19,10 +19,19 @@ Content-Type: application/json
 }
 
 ###
-PUT http://localhost:3001/api/persons/61914c5be6bee5c22b9208ce
+PUT http://localhost:3001/api/persons/6192583e935143db8220410c
 Content-Type: application/json
 
 {
-  "name": "Temple Olowonigba",
+  "name": "Tim Cook",
   "number": "737-373731"
+}
+
+###
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+  "name": "Yi Xiping",
+  "number": "419-49916"
 }
