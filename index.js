@@ -93,7 +93,7 @@ app.delete('/api/persons/:id', async (req, res) => {
   res.status(404).end();
 });
 
-app.put('/api/persons/:id', async (req, res) => {
+app.put('/api/persons/:id', async (req, res, next) => {
   const { id } = req.params;
   const { name, number } = req.body;
 
@@ -102,10 +102,15 @@ app.put('/api/persons/:id', async (req, res) => {
     number,
   };
 
-  const updatedPerson = await Person.findByIdAndUpdate(id, person, {
-    new: true,
-  });
-  res.json(updatedPerson);
+  try {
+    const updatedPerson = await Person.findByIdAndUpdate(id, person, {
+      new: true,
+      runValidators: true,
+    });
+    res.json(updatedPerson);
+  } catch (error) {
+    next(error);
+  }
 });
 
 app.use(errorHandler);
